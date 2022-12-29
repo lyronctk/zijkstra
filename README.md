@@ -1,6 +1,6 @@
 # Zijkstra
 
-Proving the shortest path through a maze with recursive SNARKs. 
+Educational tool. Proving the shortest path through a maze with recursive SNARKs. 
 
 ## Overview
 
