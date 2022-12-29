@@ -1,4 +1,4 @@
-# Zijkstra's Algorithm
+# Zijkstra
 
 Educational tool. Proving the shortest path through a maze with recursive SNARKs. 
 
