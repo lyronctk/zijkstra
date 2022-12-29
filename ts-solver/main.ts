@@ -1,7 +1,7 @@
 import PriorityQueue from "priority-queue-typescript";
 import fs from "fs";
 
-const IN_LABEL = "medium";
+const IN_LABEL = "large";
 const OUT_F = `./solutions/${IN_LABEL}.soln.json`;
 const PARAMS = require(`./examples/${IN_LABEL}.json`);
 
@@ -84,17 +84,10 @@ function dijkstra(maze: number[][], height: number, width: number): Loc[] {
     return minPath;
 }
 
-function main() {
-    const sol: Loc[] = dijkstra(
-        PARAMS["maze"],
-        PARAMS["height"],
-        PARAMS["width"]
-    );
-
-
+function writeSolution(mz: number[][], sol: Loc[]) {
     let out: { maze: number[][]; solution: Array<[[number, number], number]> } =
         {
-            maze: PARAMS["maze"],
+            maze: mz,
             solution: [],
         };
     sol.forEach((l: Loc, idx: number) => {
@@ -104,9 +97,18 @@ function main() {
             accumulated + out.maze[l.row][l.col],
         ]);
     });
-    fs.writeFile(OUT_F, JSON.stringify(out, null, 4), "utf-8", () =>
+    fs.writeFile(OUT_F, JSON.stringify(out), "utf-8", () =>
         console.log(`Done! Solution written to: ${OUT_F}`)
     );
+}
+
+function main() {
+    const sol: Loc[] = dijkstra(
+        PARAMS["maze"],
+        PARAMS["height"],
+        PARAMS["width"]
+    );
+    writeSolution(PARAMS["maze"], sol);
 }
 
 main();
