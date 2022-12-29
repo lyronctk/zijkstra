@@ -1,5 +1,9 @@
 import PriorityQueue from "priority-queue-typescript";
-const PARAMS = require("./examples/small.json");
+import fs from "fs";
+
+const IN_LABEL = "medium";
+const OUT_F = `./solutions/${IN_LABEL}.soln.json`;
+const PARAMS = require(`./examples/${IN_LABEL}.json`);
 
 const MOVES: number[][] = [
     [-1, 0],
@@ -31,20 +35,21 @@ function init2DArr(height: number, width: number, fillVal: number): number[][] {
         .map(() => new Array(width).fill(fillVal));
 }
 
-function inBounds(r: number, c: number, maze: number[][]): boolean {
-    return r >= 0 && c >= 0 && r < maze.length && c < maze[0].length;
-}
-
-function dijkstra(
-    maze: number[][],
+function inBounds(
+    r: number,
+    c: number,
     height: number,
     width: number
-): Loc[] | null {
+): boolean {
+    return r >= 0 && c >= 0 && r < height && c < width;
+}
+
+function dijkstra(maze: number[][], height: number, width: number): Loc[] {
     if (height === 0 || width === 0)
         throw new Error("Maze must have nonzero dimensions.");
 
     let minCosts = init2DArr(height, width, INF);
-    let minPath: Loc[] | null = null;
+    let minPath: Loc[] = [];
 
     let pq = new PriorityQueue<Candidate>(
         1,
@@ -56,14 +61,12 @@ function dijkstra(
         const candR: number = cand.path[cand.path.length - 1].row;
         const candC: number = cand.path[cand.path.length - 1].col;
         if (candR === height - 1 && candC === width - 1)
-            if (cand.cost < minCosts[height - 1][width - 1]) {
-                minPath = JSON.parse(JSON.stringify(cand.path));
-            }
+            minPath = JSON.parse(JSON.stringify(cand.path));
 
         MOVES.forEach((move: number[]) => {
             const stepR: number = candR + move[0];
             const stepC: number = candC + move[1];
-            if (!inBounds(stepR, stepC, maze)) return;
+            if (!inBounds(stepR, stepC, height, width)) return;
 
             const stepCostTotal: number = cand.cost + maze[stepR][stepC];
             if (stepCostTotal < minCosts[stepR][stepC]) {
@@ -81,9 +84,29 @@ function dijkstra(
     return minPath;
 }
 
-const minPath: Loc[] | null = dijkstra(
-    PARAMS["maze"],
-    PARAMS["height"],
-    PARAMS["with"]
-);
-console.log(minPath);
+function main() {
+    const sol: Loc[] = dijkstra(
+        PARAMS["maze"],
+        PARAMS["height"],
+        PARAMS["width"]
+    );
+
+
+    let out: { maze: number[][]; solution: Array<[[number, number], number]> } =
+        {
+            maze: PARAMS["maze"],
+            solution: [],
+        };
+    sol.forEach((l: Loc, idx: number) => {
+        const accumulated: number = idx !== 0 ? out.solution[idx - 1][1] : 0;
+        out.solution.push([
+            [l.row, l.col],
+            accumulated + out.maze[l.row][l.col],
+        ]);
+    });
+    fs.writeFile(OUT_F, JSON.stringify(out, null, 4), "utf-8", () =>
+        console.log(`Done! Solution written to: ${OUT_F}`)
+    );
+}
+
+main();
