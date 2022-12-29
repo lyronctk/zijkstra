@@ -1,18 +1,30 @@
 import PriorityQueue from "priority-queue-typescript";
 const PARAMS = require("./examples/small.json");
 
+type Loc = {
+    row: number;
+    col: number;
+};
+
+class Candidate {
+    cost: number;
+    path: Loc[];
+
+    constructor(prefixPath: Loc[], stepCostTotal: number, stepLoc: Loc) {
+        this.path = JSON.parse(JSON.stringify(prefixPath));
+        this.path.push(stepLoc);
+        this.cost = stepCostTotal;
+    }
+}
+
 function dijkstra(maze: number[][]) {
     console.log(maze);
 
-    const pq = new PriorityQueue<number>(1, (a: number, b: number) => a - b);
-    pq.add(10);
-    pq.add(5);
-    pq.add(15);
-    pq.add(150);
-    pq.add(2);
-    console.log(pq.poll());
-    console.log(pq.poll());
-    console.log(pq.poll());
+    const pq = new PriorityQueue<Candidate>(
+        1,
+        (a: Candidate, b: Candidate) => a.cost - b.cost
+    );
+    
 }
 
 function resize(arr: number[][], w: number, h: number): number[][] {
