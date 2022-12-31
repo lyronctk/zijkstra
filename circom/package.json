@@ -1,0 +1,13 @@
+{
+  "name": "circom",
+  "version": "1.0.0",
+  "main": "traversal.circom",
+  "license": "MIT",
+  "scripts": {
+    "dev": "bash scotia_dev.sh"
+  },
+  "dependencies": {
+    "circomlib": "^2.0.5",
+    "snarkjs": "^0.5.0"
+  }
+}

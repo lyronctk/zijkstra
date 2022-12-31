@@ -1,0 +1,10 @@
+node_modules/
+
+artifacts/
+
+traversal_cpp/
+traversal_js/
+traversal.json
+traversal.r1cs
+traversal.sym
+traversal.wtns

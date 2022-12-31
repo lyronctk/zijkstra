@@ -1,9 +1,12 @@
 {
   "name": "ts-solver",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "main.ts",
   "license": "MIT",
   "dependencies": {
     "priority-queue-typescript": "^1.0.1"
+  },
+  "scripts": {
+    "solve": "ts-node main.ts"
   }
 }
