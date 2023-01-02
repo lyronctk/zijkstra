@@ -3,80 +3,14 @@ pragma circom 2.0.3;
 include "./node_modules/circomlib/circuits/comparators.circom";
 include "./node_modules/circomlib/circuits/gates.circom";
 
-/*
- * Computes sum of input array of length N. Implementation from MACI project. 
- */
-template CalculateTotal(N) {   
-    signal input arr[N];
-    signal output out;
-
-    signal sums[N];
-    sums[0] <== arr[0];
-
-    for (var i=1; i < N; i++) {
-        sums[i] <== sums[i - 1] + arr[i];
-    }
-
-    out <== sums[N - 1];
-}
-
-/*
- * Selector for 2d array of size [H x W]. Returns grid value at (r, c).
- */
-template GridSelector(H, W) {
-    signal input grid[H][W];
-    signal input r;
-    signal input c; 
-    signal output out;
-
-    component rowEq[H][W];
-    component colEq[H][W];
-    component mask[H][W];
-    component total = CalculateTotal(H * W);
-    for (var i = 0; i < H; i++) {
-        for (var j = 0; j < W; j++) {
-            rowEq[i][j] = IsEqual();
-            rowEq[i][j].in[0] <== i;
-            rowEq[i][j].in[1] <== r;
-
-            colEq[i][j] = IsEqual();
-            colEq[i][j].in[0] <== j;
-            colEq[i][j].in[1] <== c;
-
-            mask[i][j] = AND();
-            mask[i][j].a <== rowEq[i][j].out;
-            mask[i][j].b <== colEq[i][j].out;
-
-            total.arr[i * W + j] <== grid[i][j] * mask[i][j].out;
-        }
-    }
-    out <== total.out;
-}
-
-/*
- * Verify that an (r, c) coordinate is within some height (h) and width (w). 
- * Values of the bounds must fit in DIM_BITS or under. 
- */
-template InBounds(DIM_BITS) {
-    signal input coord[2];
-    signal input h;
-    signal input w;
-
-    component boundR = LessThan(DIM_BITS);
-    boundR.in[0] <== coord[0];
-    boundR.in[1] <== h;
-    boundR.out === 1;
-
-    component boundC = LessThan(DIM_BITS);
-    boundC.in[0] <== coord[1];
-    boundC.in[1] <== w;
-    boundC.out === 1;
-}
+include "./traversal_utils.circom";
 
 template Traversal(MAX_HEIGHT, MAX_WIDTH, DIM_BITS){
+    var VALID_MOVES[4][2] = [[0, 1], [0, -1], [1, 0], [-1, 0]];
+
     signal input grid[MAX_HEIGHT][MAX_WIDTH];
     signal input height;
-    signal input width; 
+    signal input width;
     signal input loc2[2];
     signal input cost2;
 
@@ -95,6 +29,11 @@ template Traversal(MAX_HEIGHT, MAX_WIDTH, DIM_BITS){
     inBounds.coord <== loc2;
     inBounds.h <== height;
     inBounds.w <== width;
+
+    // Delta b/w loc1 to loc2 must at mostone step in the cardinal directions
+    var delta = [loc2[0] - loc1[0], loc2[1] - loc1[1]];
+    signal isValidMove <== PairArrayContains(4)(VALID_MOVES, delta);
+    isValidMove === 1;
 }
 
 component main { public [ grid, loc2, cost2 ] } = Traversal(5, 5, 3);
