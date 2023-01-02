@@ -1,3 +1,7 @@
+/*
+ * Utility templates for traversal circuit. Primarily composed of array 
+ * operations. 
+ */
 pragma circom 2.1.1;
 
 /*
@@ -9,25 +13,16 @@ template GridSelector(H, W) {
     signal input c; 
     signal output out;
 
-    component rowEq[H][W];
-    component colEq[H][W];
-    component mask[H][W];
+    signal rowEq[H][W];
+    signal colEq[H][W];
+    signal mask[H][W];
     component total = ArraySum(H * W);
     for (var i = 0; i < H; i++) {
         for (var j = 0; j < W; j++) {
-            rowEq[i][j] = IsEqual();
-            rowEq[i][j].in[0] <== i;
-            rowEq[i][j].in[1] <== r;
-
-            colEq[i][j] = IsEqual();
-            colEq[i][j].in[0] <== j;
-            colEq[i][j].in[1] <== c;
-
-            mask[i][j] = AND();
-            mask[i][j].a <== rowEq[i][j].out;
-            mask[i][j].b <== colEq[i][j].out;
-
-            total.arr[i * W + j] <== grid[i][j] * mask[i][j].out;
+            rowEq[i][j] <== IsEqual()([i, r]);
+            colEq[i][j] <== IsEqual()([j, c]);
+            mask[i][j] <== AND()(rowEq[i][j], colEq[i][j]);
+            total.arr[i * W + j] <== grid[i][j] * mask[i][j];
         }
     }
     out <== total.out;
@@ -42,15 +37,11 @@ template InBounds(DIM_BITS) {
     signal input h;
     signal input w;
 
-    component boundR = LessThan(DIM_BITS);
-    boundR.in[0] <== coord[0];
-    boundR.in[1] <== h;
-    boundR.out === 1;
+    signal boundR <== LessThan(DIM_BITS)([coord[0], h]);
+    boundR === 1;
 
-    component boundC = LessThan(DIM_BITS);
-    boundC.in[0] <== coord[1];
-    boundC.in[1] <== w;
-    boundC.out === 1;
+    signal boundC <== LessThan(DIM_BITS)([coord[1], w]);
+    boundC === 1;
 }
 
 /*
@@ -63,7 +54,6 @@ template ArraySum(N) {
 
     signal sums[N];
     sums[0] <== arr[0];
-
     for (var i=1; i < N; i++) {
         sums[i] <== sums[i - 1] + arr[i];
     }

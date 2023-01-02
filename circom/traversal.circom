@@ -1,3 +1,7 @@
+/*
+ * Verifies one step of a purported path through a grid. Designed to be used
+ * recursively to prove proper traversal of entire path. 
+ */
 pragma circom 2.1.1;
 
 include "./node_modules/circomlib/circuits/comparators.circom";
@@ -5,7 +9,7 @@ include "./node_modules/circomlib/circuits/gates.circom";
 
 include "./traversal_utils.circom";
 
-template Traversal(MAX_HEIGHT, MAX_WIDTH, DIM_BITS){
+template Main(MAX_HEIGHT, MAX_WIDTH, DIM_BITS){
     var VALID_MOVES[4][2] = [[0, 1], [0, -1], [1, 0], [-1, 0]];
 
     signal input grid[MAX_HEIGHT][MAX_WIDTH];
@@ -20,15 +24,15 @@ template Traversal(MAX_HEIGHT, MAX_WIDTH, DIM_BITS){
     // Accrued cost must be updated correctly
     signal stepCost <== 
         GridSelector(MAX_HEIGHT, MAX_WIDTH)(grid, loc2[0], loc2[1]);
-    // cost2 === cost1 + stepCost;
+    cost2 === cost1 + stepCost;
 
     // loc2 must be a valid location on the grid
     InBounds(DIM_BITS)(loc2, height, width);
 
-    // Delta b/w loc1 to loc2 must at mostone step in the cardinal directions
+    // Delta from loc1->loc2 must be at most one step in the cardinal directions
     var delta[2] = [loc2[0] - loc1[0], loc2[1] - loc1[1]];
     signal isValidMove <== PairArrayContains(4)(VALID_MOVES, delta);
-    // isValidMove === 1;
+    isValidMove === 1;
 }
 
-component main { public [ grid, loc2, cost2 ] } = Traversal(5, 5, 3);
+component main { public [ grid, loc2, cost2 ] } = Main(5, 5, 3);
