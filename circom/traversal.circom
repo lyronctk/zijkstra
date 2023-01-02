@@ -1,4 +1,4 @@
-pragma circom 2.0.3;
+pragma circom 2.1.1;
 
 include "./node_modules/circomlib/circuits/comparators.circom";
 include "./node_modules/circomlib/circuits/gates.circom";
@@ -18,22 +18,17 @@ template Traversal(MAX_HEIGHT, MAX_WIDTH, DIM_BITS){
     signal input cost1;
 
     // Accrued cost must be updated correctly
-    component stepCost = GridSelector(MAX_HEIGHT, MAX_WIDTH);
-    stepCost.grid <== grid;
-    stepCost.r <== loc2[0];
-    stepCost.c <== loc2[1];
-    cost2 === cost1 + stepCost.out;
+    signal stepCost <== 
+        GridSelector(MAX_HEIGHT, MAX_WIDTH)(grid, loc2[0], loc2[1]);
+    // cost2 === cost1 + stepCost;
 
     // loc2 must be a valid location on the grid
-    component inBounds = InBounds(DIM_BITS);
-    inBounds.coord <== loc2;
-    inBounds.h <== height;
-    inBounds.w <== width;
+    InBounds(DIM_BITS)(loc2, height, width);
 
     // Delta b/w loc1 to loc2 must at mostone step in the cardinal directions
-    var delta = [loc2[0] - loc1[0], loc2[1] - loc1[1]];
+    var delta[2] = [loc2[0] - loc1[0], loc2[1] - loc1[1]];
     signal isValidMove <== PairArrayContains(4)(VALID_MOVES, delta);
-    isValidMove === 1;
+    // isValidMove === 1;
 }
 
 component main { public [ grid, loc2, cost2 ] } = Traversal(5, 5, 3);

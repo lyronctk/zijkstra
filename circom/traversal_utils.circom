@@ -1,3 +1,5 @@
+pragma circom 2.1.1;
+
 /*
  * Selector for 2d array of size [H x W]. Returns grid value at (r, c).
  */
