@@ -17,9 +17,9 @@ fn main() {
     let iteration_count = 5;
     let root = current_dir().unwrap();
 
-    let circuit_file = root.join("toy.r1cs");
+    let circuit_file = root.join("src/toy.r1cs");
     let r1cs = load_r1cs(&circuit_file);
-    let witness_generator_file = root.join("toy.wasm");
+    let witness_generator_file = root.join("src/toy_js/toy.wasm");
 
     let mut private_inputs = Vec::new();
     for i in 0..iteration_count {
@@ -29,6 +29,10 @@ fn main() {
     }
 
     let start_public_input = vec![F1::from(10), F1::from(10)];
+
+    println!("private_inputs: {:?}", private_inputs);
+    println!("start_public_input: {:?}", start_public_input);
+    return;
 
     let pp = create_public_params(r1cs.clone());
 
