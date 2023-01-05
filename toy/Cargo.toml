@@ -6,8 +6,8 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-nova_scotia = { path = "../../nova-scotia" }
-nova-snark = "0.9.0"
+nova-scotia = { path = "../../nova-scotia" }
+nova-snark = { path = "../../nova-snark" }
 ff = "0.13.0"
 serde_json = "1.0.91"
 serde = "1.0.152"

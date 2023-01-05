@@ -1,20 +1,13 @@
-use std::{
-    collections::HashMap,
-    env::current_dir,
-    io::Write,
-    time::{Duration, Instant},
-};
+use std::{collections::HashMap, env::current_dir, time::Instant};
 
-use ff::PrimeField;
 use nova_scotia::{
     circom::reader::load_r1cs, create_public_params, create_recursive_circuit, F1, G1, G2,
 };
 use nova_snark::{traits::Group, CompressedSNARK};
-use serde::{Deserialize, Serialize};
 use serde_json::json;
 
 fn main() {
-    let iteration_count = 3;
+    let iteration_count = 10;
     let root = current_dir().unwrap();
 
     let circuit_file = root.join("src/toy.r1cs");
@@ -85,6 +78,10 @@ fn main() {
     );
     assert!(res.is_ok());
     let compressed_snark = res.unwrap();
+
+    println!("== COMPRESSED SNARK PROOF");
+    println!("{:?}", compressed_snark.f_W_snark_primary);
+    println!("==");
 
     // verify the compressed SNARK
     println!("Verifying a CompressedSNARK...");

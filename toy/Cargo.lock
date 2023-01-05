@@ -692,10 +692,26 @@ dependencies = [
 ]
 
 [[package]]
+name = "nova-scotia"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "bellperson",
+ "byteorder",
+ "ff 0.12.1",
+ "hex-literal",
+ "itertools 0.9.0",
+ "nova-snark",
+ "num-bigint 0.4.3",
+ "num-traits",
+ "pasta_curves",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "nova-snark"
 version = "0.9.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d588bd06dd0ae3f9874480a1fd9338caadf4475e14043afc5c19341a82fd48de"
 dependencies = [
  "bellperson",
  "bellperson-nonnative",
@@ -719,24 +735,6 @@ dependencies = [
  "serde",
  "sha3",
  "subtle",
-]
-
-[[package]]
-name = "nova_scotia"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "bellperson",
- "byteorder",
- "ff 0.12.1",
- "hex-literal",
- "itertools 0.9.0",
- "nova-snark",
- "num-bigint 0.4.3",
- "num-traits",
- "pasta_curves",
- "serde",
- "serde_json",
 ]
 
 [[package]]
@@ -1118,8 +1116,8 @@ name = "toy"
 version = "0.1.0"
 dependencies = [
  "ff 0.13.0",
+ "nova-scotia",
  "nova-snark",
- "nova_scotia",
  "serde",
  "serde_json",
 ]
