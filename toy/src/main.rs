@@ -7,12 +7,12 @@ use nova_snark::{traits::Group, CompressedSNARK};
 use serde_json::json;
 
 fn main() {
-    let iteration_count = 10;
+    let iteration_count = 2;
     let root = current_dir().unwrap();
 
     let circuit_file = root.join("src/toy.r1cs");
     let r1cs = load_r1cs(&circuit_file);
-    let witness_generator_file = root.join("src/toy_js/toy.wasm");
+    let witness_generator_file = root.join("src/toy.wasm");
 
     let mut private_inputs = Vec::new();
     for i in 0..iteration_count {
