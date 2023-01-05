@@ -14,7 +14,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::json;
 
 fn main() {
-    let iteration_count = 5;
+    let iteration_count = 3;
     let root = current_dir().unwrap();
 
     let circuit_file = root.join("src/toy.r1cs");
@@ -30,10 +30,6 @@ fn main() {
 
     let start_public_input = vec![F1::from(10), F1::from(10)];
 
-    println!("private_inputs: {:?}", private_inputs);
-    println!("start_public_input: {:?}", start_public_input);
-    return;
-
     let pp = create_public_params(r1cs.clone());
 
     println!(
@@ -43,15 +39,6 @@ fn main() {
     println!(
         "Number of constraints per step (secondary circuit): {}",
         pp.num_constraints().1
-    );
-
-    println!(
-        "Number of variables per step (primary circuit): {}",
-        pp.num_variables().0
-    );
-    println!(
-        "Number of variables per step (secondary circuit): {}",
-        pp.num_variables().1
     );
 
     println!("Creating a RecursiveSNARK...");
