@@ -7,7 +7,7 @@ pragma circom 2.1.1;
 include "./node_modules/circomlib/circuits/comparators.circom";
 include "./node_modules/circomlib/circuits/gates.circom";
 
-include "./traversal_utils.circom";
+include "./utils.circom";
 
 template Main(MAX_HEIGHT, MAX_WIDTH, DIM_BITS){
     var VALID_MOVES[4][2] = [[0, 1], [0, -1], [1, 0], [-1, 0]];
