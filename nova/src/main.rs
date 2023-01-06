@@ -80,4 +80,34 @@ fn main() {
         start.elapsed()
     );
     assert!(res.is_ok());
+
+    // produce a compressed SNARK
+    println!("Generating a CompressedSNARK using Spartan with IPA-PC...");
+    let start = Instant::now();
+    type S1 = nova_snark::spartan_with_ipa_pc::RelaxedR1CSSNARK<G1>;
+    type S2 = nova_snark::spartan_with_ipa_pc::RelaxedR1CSSNARK<G2>;
+    let res = CompressedSNARK::<_, _, _, _, S1, S2>::prove(&pp, &recursive_snark);
+    println!(
+        "CompressedSNARK::prove: {:?}, took {:?}",
+        res.is_ok(),
+        start.elapsed()
+    );
+    assert!(res.is_ok());
+    let compressed_snark = res.unwrap();
+
+    // verify the compressed SNARK
+    println!("Verifying a CompressedSNARK...");
+    let start = Instant::now();
+    let res = compressed_snark.verify(
+        &pp,
+        num_steps,
+        start_public_input.clone(),
+        z0_secondary,
+    );
+    println!(
+        "CompressedSNARK::verify: {:?}, took {:?}",
+        res.is_ok(),
+        start.elapsed()
+    );
+    assert!(res.is_ok());
 }
