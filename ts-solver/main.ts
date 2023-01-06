@@ -9,7 +9,7 @@ import PriorityQueue from "priority-queue-typescript";
 import fs from "fs";
 
 // Label of .json parameters in examples/
-const IN_LABEL = "large";
+const IN_LABEL = "small";
 
 // Writes solution to this file
 const OUT_F = `./solutions/${IN_LABEL}.soln.json`;
@@ -102,18 +102,11 @@ function dijkstra(maze: number[][], height: number, width: number): Loc[] {
  * each step. 
  */
 function writeSolution(mz: number[][], sol: Loc[]) {
-    let out: { maze: number[][]; solution: Array<[[number, number], number]> } =
+    let out: { maze: number[][]; solution: Array<[number, number]> } =
         {
             maze: mz,
-            solution: [],
+            solution: sol.map((l: Loc) => [l.row, l.col]),
         };
-    sol.forEach((l: Loc, idx: number) => {
-        const accumulated: number = idx !== 0 ? out.solution[idx - 1][1] : 0;
-        out.solution.push([
-            [l.row, l.col],
-            accumulated + out.maze[l.row][l.col],
-        ]);
-    });
     fs.writeFile(OUT_F, JSON.stringify(out), "utf-8", () =>
         console.log(`Done! Solution written to: ${OUT_F}`)
     );
