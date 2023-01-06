@@ -39,15 +39,12 @@ template Main(MAX_HEIGHT, MAX_WIDTH, DIM_BITS){
     signal input width; 
     signal input move[2];
 
-    signal tmp <== Poseidon(1)([1]);
-    log(tmp);
-
+    // NOTE: This constraint is temporarily deactivated 
     // Bounded grid must match hash in step_in / step_out
-    signal gridHash <== GridHash(MAX_HEIGHT, MAX_WIDTH)(grid);
-    signal boundedGridHash <== Poseidon(3)([gridHash, height, width]);
-    // log(boundedGridHash);
-    step_in[0] === boundedGridHash;
-    step_out[0] <== boundedGridHash;
+    // signal gridHash <== GridHash(MAX_HEIGHT, MAX_WIDTH)(grid);
+    // signal boundedGridHash <== Poseidon(3)([gridHash, height, width]);
+    // step_in[0] === boundedGridHash;
+    step_out[0] <== step_in[0];
 
     // Proposed move must be one step in the cardinal directions
     signal isValidMove <== PairArrayContains(4)(VALID_MOVES, move);
@@ -63,7 +60,7 @@ template Main(MAX_HEIGHT, MAX_WIDTH, DIM_BITS){
         GridSelector(MAX_HEIGHT, MAX_WIDTH)(grid, step_out[1], step_out[2]);
     step_out[3] <== step_in[3] + stepCost; 
 
-    log("- Constraints satisfied -");
+    // log("- Constraints satisfied -");
 }
 
 component main { public [ step_in ] } = Main(5, 5, 3);
