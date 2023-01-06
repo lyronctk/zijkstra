@@ -3,7 +3,7 @@
 # ==
 
 # Compile circuit
-circom ../traversal.circom --r1cs --wasm
+circom ../traversal.circom --r1cs --wasm --prime vesta
 
 # Generate the witness, primarily as a smoke test for the circuit
 node traversal_js/generate_witness.js traversal_js/traversal.wasm smoke_test.json traversal.wtns

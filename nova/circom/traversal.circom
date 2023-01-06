@@ -39,9 +39,13 @@ template Main(MAX_HEIGHT, MAX_WIDTH, DIM_BITS){
     signal input width; 
     signal input move[2];
 
+    signal tmp <== Poseidon(1)([1]);
+    log(tmp);
+
     // Bounded grid must match hash in step_in / step_out
     signal gridHash <== GridHash(MAX_HEIGHT, MAX_WIDTH)(grid);
     signal boundedGridHash <== Poseidon(3)([gridHash, height, width]);
+    // log(boundedGridHash);
     step_in[0] === boundedGridHash;
     step_out[0] <== boundedGridHash;
 

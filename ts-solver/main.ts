@@ -9,7 +9,7 @@ import PriorityQueue from "priority-queue-typescript";
 import fs from "fs";
 
 // Label of .json parameters in examples/
-const IN_LABEL = "small";
+const IN_LABEL = "large";
 
 // Writes solution to this file
 const OUT_F = `./solutions/${IN_LABEL}.soln.json`;
@@ -59,9 +59,9 @@ function inBounds(l: Loc, height: number, width: number): boolean {
     return l.row >= 0 && l.col >= 0 && l.row < height && l.col < width;
 }
 
-/* 
- * Run Dijkstra's to find the lowest cost path from the top left to the bottom 
- * right of the grid. Moves only along the cardinal directions. 
+/*
+ * Run Dijkstra's to find the lowest cost path from the top left to the bottom
+ * right of the grid. Moves only along the cardinal directions.
  */
 function dijkstra(maze: number[][], height: number, width: number): Loc[] {
     if (height === 0 || width === 0)
@@ -98,15 +98,21 @@ function dijkstra(maze: number[][], height: number, width: number): Loc[] {
 
 /*
  * Write the lowest cost path to a json file. This file stores the maze, along
- * with an enumeration of the path that has the accumulated cost attached to 
- * each step. 
+ * with an enumeration of the path that has the accumulated cost attached to
+ * each step.
  */
-function writeSolution(mz: number[][], sol: Loc[]) {
-    let out: { maze: number[][]; solution: Array<[number, number]> } =
-        {
-            maze: mz,
-            solution: sol.map((l: Loc) => [l.row, l.col]),
-        };
+function writeSolution(mz: number[][], h: number, w: number, sol: Loc[]) {
+    let out: {
+        maze: number[][];
+        height: number;
+        width: number;
+        solution: Array<[number, number]>;
+    } = {
+        maze: mz,
+        height: h,
+        width: w,
+        solution: sol.map((l: Loc) => [l.row, l.col]),
+    };
     fs.writeFile(OUT_F, JSON.stringify(out), "utf-8", () =>
         console.log(`Done! Solution written to: ${OUT_F}`)
     );
@@ -118,7 +124,7 @@ function main() {
         PARAMS["height"],
         PARAMS["width"]
     );
-    writeSolution(PARAMS["maze"], sol);
+    writeSolution(PARAMS["maze"], PARAMS["height"], PARAMS["width"], sol);
 }
 
 main();
