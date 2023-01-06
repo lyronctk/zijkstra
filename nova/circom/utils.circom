@@ -4,6 +4,18 @@
  */
 pragma circom 2.1.1;
 
+include "./node_modules/circomlib/circuits/poseidon.circom";
+
+template GridHash(H, W) {
+    signal input grid[H][W];
+    signal output out; 
+
+    signal rowHashes[H];
+    for (var i = 0; i < H; i++)
+        rowHashes[i] <== Poseidon(W)(grid[i]);
+    out <== Poseidon(H)(rowHashes);
+}
+
 /*
  * Selector for 2d array of size [H x W]. Returns grid value at (r, c).
  */
