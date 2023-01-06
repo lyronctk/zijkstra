@@ -39,24 +39,25 @@ template Main(MAX_HEIGHT, MAX_WIDTH, DIM_BITS){
     signal input width; 
     signal input move[2];
 
+    // Bounded grid must match hash in step_in / step_out
     signal gridHash <== GridHash(MAX_HEIGHT, MAX_WIDTH)(grid);
     signal boundedGridHash <== Poseidon(3)([gridHash, height, width]);
-    log(boundedGridHash);
-    log(step_in[0]);
     step_in[0] === boundedGridHash;
+    step_out[0] <== boundedGridHash;
 
-    // // Accrued cost must be updated correctly
-    // signal stepCost <== 
-    //     GridSelector(MAX_HEIGHT, MAX_WIDTH)(grid, loc2[0], loc2[1]);
-    // cost2 === cost1 + stepCost;
+    // Proposed move must be one step in the cardinal directions
+    signal isValidMove <== PairArrayContains(4)(VALID_MOVES, move);
+    isValidMove === 1;
 
-    // // loc2 must be a valid location on the grid
-    // InBounds(DIM_BITS)(loc2, height, width);
+    // Update location and verify that it is in bounds 
+    step_out[1] <== step_in[1] + move[0];
+    step_out[2] <== step_in[2] + move[1];
+    InBounds(DIM_BITS)([step_out[1], step_out[2]], height, width);
 
-    // // Delta from loc1->loc2 must be at most one step in the cardinal directions
-    // var delta[2] = [loc2[0] - loc1[0], loc2[1] - loc1[1]];
-    // signal isValidMove <== PairArrayContains(4)(VALID_MOVES, delta);
-    // isValidMove === 1;
+    // Update accrued cost 
+    signal stepCost <== 
+        GridSelector(MAX_HEIGHT, MAX_WIDTH)(grid, step_out[1], step_out[2]);
+    step_out[3] <== step_in[3] + stepCost; 
 
     log("- Constraints satisfied -");
 }
