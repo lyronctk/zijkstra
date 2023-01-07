@@ -7,6 +7,8 @@ use nova_snark::{
     traits::circuit::TrivialTestCircuit, traits::Group, CompressedSNARK,
     PublicParams, RecursiveSNARK,
 };
+use num_bigint::BigInt;
+use num_traits::Num;
 use serde::Deserialize;
 use serde_json::{json, Value};
 
@@ -45,6 +47,11 @@ fn read_solved_maze(path: &str) -> SolvedMaze {
     serde_json::from_reader(rdr).unwrap()
 }
 
+/*
+ * Constructs the inputs necessary for recursion. Concretely, this includes
+ * 1) private inputs for every step, and 2) initial public inputs for the
+ * first step of the primary & secondary circuits.
+ */
 fn construct_inputs(
     solved_maze: &SolvedMaze,
     num_steps: usize,
@@ -83,6 +90,23 @@ fn construct_inputs(
     }
 }
 
+fn Fq_to_decimal_str(v: Vec<F1>) -> Vec<String> {
+    let hexified = v
+        .iter()
+        .map(|&x| format!("{:?}", x).strip_prefix("0x").unwrap().to_string())
+        .collect::<Vec<String>>();
+
+    hexified
+        .iter()
+        .map(|x| BigInt::from_str_radix(x, 16).unwrap().to_str_radix(10))
+        .collect()
+}
+
+/*
+ * Uses Nova's folding scheme to produce a single relaxed R1CS instance that,
+ * when satisfied, proves the proper execution of every step in the recursion.
+ * Can be thought of as a pre-processing step for the final SNARK.
+ */
 fn recursion(
     witness_gen: PathBuf,
     r1cs: R1CS<F1>,
@@ -102,7 +126,7 @@ fn recursion(
     .unwrap();
     println!("- Done ({:?})", start.elapsed());
 
-    println!("- Verifying RecursiveSNARK...");
+    println!("- Verifying RecursiveSNARK");
     let start = Instant::now();
     let res = recursive_snark.verify(
         &pp,
@@ -111,11 +135,19 @@ fn recursion(
         inputs.start_pub_secondary.clone(),
     );
     assert!(res.is_ok());
+    println!(
+        "- Output of final step: {:?}",
+        Fq_to_decimal_str(res.unwrap().0)
+    );
     println!("- Done ({:?})", start.elapsed());
 
     recursive_snark
 }
 
+/*
+ * Uses Spartan w/ IPA-PC to prove knowledge of the output of Nova (a satisfied
+ * relaxed R1CS instance) in a proof that can be verified with sub-linear cost.
+ */
 fn spartan(
     pp: &PublicParams<G1, G2, C1, C2>,
     recursive_snark: RecursiveSNARK<G1, G2, C1, C2>,
@@ -131,8 +163,8 @@ fn spartan(
     assert!(res.is_ok());
     println!("- Done ({:?})", start.elapsed());
     let compressed_snark = res.unwrap();
+    println!("- Proof: {:?}", compressed_snark.f_W_snark_primary);
 
-    // verify the compressed SNARK
     println!("- Verifying");
     let start = Instant::now();
     let res = compressed_snark.verify(
@@ -143,7 +175,6 @@ fn spartan(
     );
     assert!(res.is_ok());
     println!("- Done ({:?})", start.elapsed());
-    println!("- Final output: {:?}", res.is_ok());
 
     compressed_snark
 }
