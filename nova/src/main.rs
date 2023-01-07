@@ -1,17 +1,25 @@
+/*
+ * Recursively proves knowledge of the shortest path through a maze using a
+ * combination of Nova and Spartan w/ IPA-PC. Concretely, this produces a SNARK
+ * proof that shows "I know a path leading to cell [X, Y] at cost C" and can be
+ * verified in sub-linear time.
+ */
+
 use nova_scotia::{
-    circom::circuit::CircomCircuit, circom::circuit::R1CS,
-    circom::reader::load_r1cs, create_public_params, create_recursive_circuit,
-    F1, F2, G1, G2,
+    circom::{
+        circuit::{CircomCircuit, R1CS},
+        reader::load_r1cs,
+    },
+    create_public_params, create_recursive_circuit, F1, F2, G1, G2,
 };
 use nova_snark::{
-    traits::circuit::TrivialTestCircuit, traits::Group, CompressedSNARK,
-    PublicParams, RecursiveSNARK,
+    traits::{circuit::TrivialTestCircuit, Group},
+    CompressedSNARK, PublicParams, RecursiveSNARK,
 };
 use num_bigint::BigInt;
 use num_traits::Num;
 use serde::Deserialize;
 use serde_json::{json, Value};
-
 use std::{
     collections::HashMap, env::current_dir, fs::File, io::BufReader,
     path::PathBuf, time::Instant,
@@ -66,9 +74,9 @@ fn setup(r1cs: &R1CS<F1>) -> PublicParams<G1, G2, C1, C2> {
 }
 
 /*
- * Constructs the inputs necessary for recursion. Concretely, this includes
- * 1) private inputs for every step, and 2) initial public inputs for the
- * first step of the primary & secondary circuits.
+ * Constructs the inputs necessary for recursion. This includes 1) private
+ * inputs for every step, and 2) initial public inputs for the first step of the
+ * primary & secondary circuits.
  */
 fn construct_inputs(
     solved_maze: &SolvedMaze,
@@ -109,8 +117,8 @@ fn construct_inputs(
 }
 
 /*
- * Converts hex elements (field elements in this case) into decimal strings for 
- * logging. 
+ * Converts hex elements (field elements in this case) into decimal strings for
+ * logging.
  */
 fn hex_to_decimal_str(v: Vec<F1>) -> Vec<String> {
     let stripped = v
