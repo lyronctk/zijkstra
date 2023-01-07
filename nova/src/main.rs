@@ -1,11 +1,11 @@
 use nova_scotia::{
     circom::circuit::CircomCircuit, circom::circuit::R1CS,
     circom::reader::load_r1cs, create_public_params, create_recursive_circuit,
-    F1, F2, G1, G2, C1, C2
+    F1, F2, G1, G2,
 };
 use nova_snark::{
-    traits::circuit::TrivialTestCircuit, CompressedSNARK,
-    PublicParams,
+    traits::circuit::TrivialTestCircuit, traits::Group, CompressedSNARK,
+    PublicParams, RecursiveSNARK,
 };
 use serde::Deserialize;
 use serde_json::{json, Value};
@@ -14,6 +14,9 @@ use std::{
     collections::HashMap, env::current_dir, fs::File, io::BufReader,
     path::PathBuf, time::Instant,
 };
+
+type C1 = CircomCircuit<<G1 as Group>::Scalar>;
+type C2 = TrivialTestCircuit<<G2 as Group>::Scalar>;
 
 const R1CS_F: &str = "./circom/out/traversal.r1cs";
 const WASM_F: &str = "./circom/out/traversal.wasm";
@@ -82,7 +85,7 @@ fn recursion(
     pp: PublicParams<G1, G2, CircomCircuit<F1>, TrivialTestCircuit<F2>>,
     num_steps: usize,
 ) -> RecursiveSNARK<G1, G2, C1, C2> {
-    println!("Creating a RecursiveSNARK...");
+    println!("- Creating RecursiveSNARK");
     let start = Instant::now();
     let recursive_snark = create_recursive_circuit(
         witness_gen,
@@ -92,10 +95,9 @@ fn recursion(
         &pp,
     )
     .unwrap();
-    println!("RecursiveSNARK creation took {:?}", start.elapsed());
+    println!("- Done ({:?})", start.elapsed());
 
-    // verify the recursive SNARK
-    println!("Verifying a RecursiveSNARK...");
+    println!("- Verifying RecursiveSNARK...");
     let start = Instant::now();
     let res = recursive_snark.verify(
         &pp,
@@ -103,12 +105,10 @@ fn recursion(
         inputs.start_pub_primary.clone(),
         inputs.start_pub_secondary.clone(),
     );
-    println!(
-        "RecursiveSNARK::verify: {:?}, took {:?}",
-        res,
-        start.elapsed()
-    );
     assert!(res.is_ok());
+    println!("- Done ({:?})", start.elapsed());
+
+    recursive_snark
 }
 
 fn main() {
