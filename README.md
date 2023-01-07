@@ -2,30 +2,27 @@
 
 Educational tool. Proving the shortest path through a maze with recursive SNARKs. 
 
-## Overview
+## Motivation
 
-Meant for learning more about recent proving systems- [Nova](https://github.com/microsoft/Nova) and [Plonky2](https://github.com/mir-protocol/plonky2) in particular- for recursive SNARKs. Verifying shortest paths found via Dijsktra's Algorithm. Ideal for focused interaction with the basic SNARK mechanics since maze traversal doesn't involve any [constraint-heavy components](https://github.com/0xPARC/circom-ecdsa) such as hash functions or signature schemes.
+Meant for learning more about recent proving systems- [Nova](https://github.com/microsoft/Nova) and [Plonky2](https://github.com/mir-protocol/plonky2) in particular- for recursive SNARKs. Verifying shortest paths found via Dijsktra's Algorithm. Ideal for focusing on the basic SNARK mechanics since maze traversal is a familiar problem that doesn't involve many constraint-heavy operations. 
 
 Why Dijkstra's insead of a simpler DFS? *Because Zijkstra is catchier than Maze Zolver of course.*
 
-## Circuit
-Definitions 
-  - L_1 := location before stepping
-  - L_2 := location after stepping
-  - C_1 := cost accrued before stepping
-  - C_2 := cost accrued after stepping
-
+## Step Circuit
 PUBLIC INPUTS 
-- grid
-- L2
-- C2
-- vk, inner SNARK verification key (?)
+1. *H*(*grid*): Hash of the grid / maze
+1. L<sub>1</sub>: Location before stepping
+1. C<sub>1</sub>: Cost accrued to get to the location 
+
+PUBLIC OUTPUTS (symmetric, same as public inputs)
+1. *H*(*grid*): Hash of the same grid / maze
+1. L<sub>2</sub>: Location after stepping
+1. C<sub>2</sub>: Cost accrued + additional cost for moving to location 
 
 PRIVATE INPUTS 
-- L1
-- C1
-- π, proof that there is a path to L1 that costs C1
+1. *A*: Grid that is traversed
+1. *m*: Move for this step [*dRow*, *dCol*]
 
-CHECKS
-- L1 -> L2 is a valid transition that costs C2 - C1
-- π verifies with inputs (Grid, L1, C1, vk)
+LOGIC
+1. Checks that the proposed move is valid 
+1. Updates location and accrued cost 
