@@ -48,6 +48,24 @@ fn read_solved_maze(path: &str) -> SolvedMaze {
 }
 
 /*
+ * Generates public parameters for Nova.
+ */
+fn setup(r1cs: &R1CS<F1>) -> PublicParams<G1, G2, C1, C2> {
+    let pp = create_public_params(r1cs.clone());
+
+    println!(
+        "- Number of constraints per step (primary): {}",
+        pp.num_constraints().0
+    );
+    println!(
+        "- Number of constraints per step (secondary): {}",
+        pp.num_constraints().1
+    );
+
+    pp
+}
+
+/*
  * Constructs the inputs necessary for recursion. Concretely, this includes
  * 1) private inputs for every step, and 2) initial public inputs for the
  * first step of the primary & secondary circuits.
@@ -90,13 +108,17 @@ fn construct_inputs(
     }
 }
 
-fn Fq_to_decimal_str(v: Vec<F1>) -> Vec<String> {
-    let hexified = v
+/*
+ * Converts hex elements (field elements in this case) into decimal strings for 
+ * logging. 
+ */
+fn hex_to_decimal_str(v: Vec<F1>) -> Vec<String> {
+    let stripped = v
         .iter()
         .map(|&x| format!("{:?}", x).strip_prefix("0x").unwrap().to_string())
         .collect::<Vec<String>>();
 
-    hexified
+    stripped
         .iter()
         .map(|x| BigInt::from_str_radix(x, 16).unwrap().to_str_radix(10))
         .collect()
@@ -137,7 +159,7 @@ fn recursion(
     assert!(res.is_ok());
     println!(
         "- Output of final step: {:?}",
-        Fq_to_decimal_str(res.unwrap().0)
+        hex_to_decimal_str(res.unwrap().0)
     );
     println!("- Done ({:?})", start.elapsed());
 
@@ -184,14 +206,14 @@ fn main() {
     let r1cs = load_r1cs(&root.join(R1CS_F));
     let witness_gen = root.join(WASM_F);
 
+    let start = Instant::now();
     println!("== Loading solved maze");
     let solved_maze = read_solved_maze(SOLVED_MAZE_F);
     let num_steps = solved_maze.solution.len() - 1;
     println!("==");
 
     println!("== Creating circuit public parameters");
-    let pp = create_public_params(r1cs.clone());
-    println!("- Done");
+    let pp = setup(&r1cs);
     println!("==");
 
     println!("== Constructing inputs");
@@ -204,5 +226,6 @@ fn main() {
 
     println!("== Producing a CompressedSNARK using Spartan w/ IPA-PC");
     let _compressed_snark = spartan(&pp, recursive_snark, num_steps, &inputs);
-    println!("==")
+    println!("==");
+    println!("** Total time to completion: ({:?})", start.elapsed());
 }
