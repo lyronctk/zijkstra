@@ -2,6 +2,8 @@
 
 Educational tool. Proving the shortest path through a maze with recursive SNARKs. 
 
+NOTE: Updating the README after wrapping up another project this week. If you want to look around before then, all the magic happens in `nova/src/main.rs` and `nova/circom/traversal.circom`. Hopefully wrote everything so it's easy to follow. 
+
 ## Motivation
 
 Meant for learning more about recent proving systems- [Nova](https://github.com/microsoft/Nova) and [Plonky2](https://github.com/mir-protocol/plonky2) in particular- for recursive SNARKs. Verifying shortest paths found via Dijsktra's Algorithm. Ideal for focusing on the basic SNARK mechanics since maze traversal is a familiar problem that doesn't involve many constraint-heavy operations. 
