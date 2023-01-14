@@ -2,7 +2,7 @@
 
 Educational tool. Proving the shortest path through a maze with recursive SNARKs. 
 
-NOTE: Updating the README after wrapping up another project this week. If you want to look around before then, all the magic happens in `nova/src/main.rs` and `nova/circom/traversal.circom`. Hopefully wrote everything so it's easy to follow. 
+NOTE: Updating the README after wrapping up another project this week. If you want to look around before then, all the magic happens in `nova/src/main.rs` and `nova/circom/traversal.circom`. Hopefully wrote everything so it's easy to follow. Also note that if you clone this repo to run, you have to clone my fork of `nova-snark` and `nova-scotia` in the parent directory (mainly made a few structs public to dissect).
 
 ## Motivation
 
