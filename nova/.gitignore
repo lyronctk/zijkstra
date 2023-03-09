@@ -2,3 +2,4 @@ circom/node_modules/
 circom/artifacts/
 
 target/
+out/spartan_proof.json
